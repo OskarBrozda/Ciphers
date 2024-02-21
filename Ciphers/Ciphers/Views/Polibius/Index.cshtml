@@ -19,7 +19,7 @@
             <tr>
             @for (int j = 0; j < 7; j++)
             {
-                <td><input type="text" name="v@(i)@(j)" value="@matrix[i, j]" maxlength="1" size="1"/></td>
+                <td><input type="text" name="v[@(i*7+j)]" value="@matrix[i, j]" maxlength="1" size="1"/></td>
             }
             </tr>
         }
