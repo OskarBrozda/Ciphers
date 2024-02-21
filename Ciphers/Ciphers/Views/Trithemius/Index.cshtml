@@ -1,0 +1,36 @@
+@{
+    ViewBag.Title = "Trithemius Cipher";
+}
+
+<h1 style="text-align: center">Szyfr Trithemiusa</h1>
+<br/>
+<form asp-action="EncryptDecrypt" asp-controller="Trithemius">
+    <div class="form-group">
+        <textarea name="text" id="text" class="form-control" rows="3" placeholder="wprowadź tekst">@ViewBag.Result</textarea>
+    </div>
+    
+    <br/>
+    
+    @if (ViewBag.DangerText != null)
+    {
+        <div class="text-danger">
+            <p>@ViewBag.DangerText</p>
+        </div>
+    }
+    
+    <br/>
+    
+    <div style="text-align: center">
+        <button type="submit" class="btn btn-primary" name="action" value="encrypt">Szyfruj</button>
+        <button type="submit" class="btn btn-primary" name="action" value="decrypt">Deszyfruj</button>
+    </div>
+</form>
+
+<br/>
+
+@if (ViewBag.Result != null)
+{
+    <div class="result">
+        <h3>Wynik: </h3><p>@ViewBag.Result</p>
+    </div>
+}
