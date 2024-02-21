@@ -20,3 +20,15 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.polibiusTable input
+{
+  border: none;
+  text-align: center;
+  width: 100px;
+  text-transform: uppercase;
+}
+
+.table-bordered>:not(caption)>*>* {
+  text-align: center;
+}
