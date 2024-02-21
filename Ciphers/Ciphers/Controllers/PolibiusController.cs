@@ -105,7 +105,8 @@ namespace PolibiusCipher.Controllers
         {
             input = input.ToUpper();
             StringBuilder encryptedText = new StringBuilder();
-
+            int index = 1;
+            
             foreach (char c in input)
             {
                 if (c == ' ') 
@@ -120,6 +121,13 @@ namespace PolibiusCipher.Controllers
                     {
                         if (PolibiusController.matrix[i, j] == c)
                         {
+                            if (IsPrime(index++))
+                            {
+                                encryptedText.Append((j + 1).ToString());
+                                encryptedText.Append((i + 1).ToString());
+                                break;
+                            }
+
                             encryptedText.Append((i + 1).ToString());
                             encryptedText.Append((j + 1).ToString());
                             break;
@@ -134,11 +142,22 @@ namespace PolibiusCipher.Controllers
         public static string Decrypt(string input)
         {
             StringBuilder decryptedText = new StringBuilder();
-
+            int index = 1;
+            
             for (int i = 0; i < input.Length; i += 2)
             {
-                int row = int.Parse(input[i].ToString()) - 1;
-                int col = int.Parse(input[i + 1].ToString()) - 1;
+                int row, col;
+                
+                if(IsPrime(index++))
+                {
+                    col = int.Parse(input[i].ToString()) - 1; 
+                    row = int.Parse(input[i + 1].ToString()) - 1;
+                }
+                else
+                {
+                    row = int.Parse(input[i].ToString()) - 1; 
+                    col = int.Parse(input[i + 1].ToString()) - 1;
+                }
 
                 if (row >= 0 && row < 5 && col >= 0 && col < 7)
                 {
@@ -147,6 +166,26 @@ namespace PolibiusCipher.Controllers
             }
 
             return decryptedText.ToString();
+        }
+        
+        public static bool IsPrime(int number)
+        {
+            if (number <= 1)
+                return false;
+
+            if (number == 2)
+                return true;
+
+            if (number % 2 == 0)
+                return false;
+
+            for (int i = 3; i <= Math.Sqrt(number); i += 2)
+            {
+                if (number % i == 0)
+                    return false;
+            }
+
+            return true;
         }
     }
 }
