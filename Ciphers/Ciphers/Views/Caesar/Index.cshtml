@@ -1,33 +1,29 @@
 @{
-    ViewBag.Title = "Polibius Cipher";
+    ViewBag.Title = "Caesar Cipher";
 }
 
-<h1 style="text-align: center">Szyfr Polibiusza</h1>
+<h1 style="text-align: center">Szyfr Cezara</h1>
 <br/>
-<form asp-action="EncryptDecrypt" asp-controller="Polibius">
+<form asp-action="EncryptDecrypt" asp-controller="Caesar">
     <div class="form-group">
         <textarea name="text" id="text" class="form-control" rows="3" placeholder="wprowadź tekst">@ViewBag.Result</textarea>
     </div>
     
     <br/>
     
-    <table class="table table-bordered polibiusTable">
-        @for (int i = 0; i < 5; i++)
-        {
-            <tr>
-            @for (int j = 0; j < 7; j++)
-            {
-                <td><input type="text" name="v[@(i*7+j)]" value="@ViewBag.PolibiusMatrix[i, j]" maxlength="1" size="1"/></td>
-            }
-            </tr>
-        }
-    </table>
+    <div class="form-group">
+        <label for="number">Klucz:</label>
+        <input type="number" class="form-control" name="number" value="@ViewBag.Number" maxlength="2"/>
+    </div>
+    
     @if (ViewBag.DangerText != null)
     {
         <div class="text-danger">
             <p>@ViewBag.DangerText</p>
         </div>
     }
+    
+    <br/>
     
     <div style="text-align: center">
         <button type="submit" class="btn btn-primary" name="action" value="encrypt">Szyfruj</button>

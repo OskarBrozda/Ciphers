@@ -3,9 +3,9 @@ using System.Security;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 
-namespace PolibiusCipher.Controllers
-{
-    public class PolibiusController : Controller
+namespace PolibiusCipher.Controllers;
+
+public class PolibiusController : Controller
     {
         public static char[,] matrix =
         {
@@ -39,9 +39,9 @@ namespace PolibiusCipher.Controllers
             }
             
             if (action == "encrypt")
-                ViewBag.result = PolibiusCipher.Encrypt(text);
+                ViewBag.result = PolibiusCipher.Encrypt(text, matrix);
             else if (action == "decrypt")
-                ViewBag.result = PolibiusCipher.Decrypt(text);
+                ViewBag.result = PolibiusCipher.Decrypt(text, matrix);
             
             ViewBag.PolibiusMatrix = matrix;
             return View("Index");
@@ -98,18 +98,17 @@ namespace PolibiusCipher.Controllers
             return true;
         }
     }
-
     public class PolibiusCipher
     {
-        public static string Encrypt(string input)
+        public static string Encrypt(string input, char[,] matrix)
         {
             input = input.ToUpper();
             StringBuilder encryptedText = new StringBuilder();
             int index = 1;
-            
+
             foreach (char c in input)
             {
-                if (c == ' ') 
+                if (c == ' ')
                 {
                     encryptedText.Append("");
                     continue;
@@ -119,7 +118,7 @@ namespace PolibiusCipher.Controllers
                 {
                     for (int j = 0; j < 7; j++)
                     {
-                        if (PolibiusController.matrix[i, j] == c)
+                        if (matrix[i, j] == c)
                         {
                             if (IsPrime(index++))
                             {
@@ -139,35 +138,35 @@ namespace PolibiusCipher.Controllers
             return encryptedText.ToString();
         }
 
-        public static string Decrypt(string input)
+        public static string Decrypt(string input, char[,] matrix)
         {
             StringBuilder decryptedText = new StringBuilder();
             int index = 1;
-            
+
             for (int i = 0; i < input.Length; i += 2)
             {
                 int row, col;
-                
-                if(IsPrime(index++))
+
+                if (IsPrime(index++))
                 {
-                    col = int.Parse(input[i].ToString()) - 1; 
+                    col = int.Parse(input[i].ToString()) - 1;
                     row = int.Parse(input[i + 1].ToString()) - 1;
                 }
                 else
                 {
-                    row = int.Parse(input[i].ToString()) - 1; 
+                    row = int.Parse(input[i].ToString()) - 1;
                     col = int.Parse(input[i + 1].ToString()) - 1;
                 }
 
                 if (row >= 0 && row < 5 && col >= 0 && col < 7)
                 {
-                    decryptedText.Append(PolibiusController.matrix[row, col]);
+                    decryptedText.Append(matrix[row, col]);
                 }
             }
 
             return decryptedText.ToString();
         }
-        
+
         public static bool IsPrime(int number)
         {
             if (number <= 1)
@@ -188,4 +187,3 @@ namespace PolibiusCipher.Controllers
             return true;
         }
     }
-}
