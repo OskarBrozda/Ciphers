@@ -1,4 +1,5 @@
 using System;
+using System.Security;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,45 +23,37 @@ namespace PolibiusCipher.Controllers
         }
 
         [HttpPost]
-        public ActionResult Encrypt(string text,
+        public ActionResult EncryptDecrypt(string text, string action,
             char v00, char v01, char v02, char v03, char v04, char v05, char v06,
             char v10, char v11, char v12, char v13, char v14, char v15, char v16,
             char v20, char v21, char v22, char v23, char v24, char v25, char v26,
             char v30, char v31, char v32, char v33, char v34, char v35, char v36,
             char v40, char v41, char v42, char v43, char v44, char v45, char v46)
         {
-            UpdateMatrix(v00, v01, v02, v03, v04, v05, v06,
-                v10, v11, v12, v13, v14, v15, v16,
-                v20, v21, v22, v23, v24, v25, v26,
-                v30, v31, v32, v33, v34, v35, v36,
-                v40, v41, v42, v43, v44, v45, v46);
-
-            ViewBag.result = PolibiusCipher.Encrypt(text);
+            if (!UpdateMatrix(v00, v01, v02, v03, v04, v05, v06,
+                    v10, v11, v12, v13, v14, v15, v16,
+                    v20, v21, v22, v23, v24, v25, v26,
+                    v30, v31, v32, v33, v34, v35, v36,
+                    v40, v41, v42, v43, v44, v45, v46))
+            {
+                ViewBag.PolibiusMatrix = matrix;
+                return View("Index");
+            }
+            
+            if (action == "encrypt")
+            {
+                ViewBag.result = PolibiusCipher.Encrypt(text);
+            }
+            else if (action == "decrypt")
+            {
+                ViewBag.result = PolibiusCipher.Decrypt(text);
+            }
+            
             ViewBag.PolibiusMatrix = matrix;
             return View("Index");
         }
 
-        [HttpPost]
-        public ActionResult Decrypt(string text,
-            char v00, char v01, char v02, char v03, char v04, char v05, char v06,
-            char v10, char v11, char v12, char v13, char v14, char v15, char v16,
-            char v20, char v21, char v22, char v23, char v24, char v25, char v26,
-            char v30, char v31, char v32, char v33, char v34, char v35, char v36,
-            char v40, char v41, char v42, char v43, char v44, char v45, char v46)
-        {
-            UpdateMatrix(v00, v01, v02, v03, v04, v05, v06,
-                v10, v11, v12, v13, v14, v15, v16,
-                v20, v21, v22, v23, v24, v25, v26,
-                v30, v31, v32, v33, v34, v35, v36,
-                v40, v41, v42, v43, v44, v45, v46);
-
-            ViewBag.Result = PolibiusCipher.Decrypt(text);
-            ViewBag.PolibiusMatrix = matrix;
-            return View("Index");
-        }
-
-        [HttpPost]
-        public void UpdateMatrix(char v00, char v01, char v02, char v03, char v04, char v05, char v06,
+        public bool UpdateMatrix(char v00, char v01, char v02, char v03, char v04, char v05, char v06,
             char v10, char v11, char v12, char v13, char v14, char v15, char v16,
             char v20, char v21, char v22, char v23, char v24, char v25, char v26,
             char v30, char v31, char v32, char v33, char v34, char v35, char v36,
@@ -190,6 +183,45 @@ namespace PolibiusCipher.Controllers
                     matrix[i, j] = result[i, j];
                 }
             }
+            
+            if (!IsCustomTableValidAndUnique(result)) return false;
+            return true;
+        }
+        
+        public bool IsCustomTableValidAndUnique(char[,] customCharTable)
+        {
+            string[] customTable = new string[35];
+            int counter = 0;
+            foreach (char c in customCharTable)
+                customTable[counter++] = c.ToString();
+         
+         
+            HashSet<string> uniqueLetters = new HashSet<string>();
+    
+            for (int i = 0; i < customTable.Length; i++)
+            {
+                if (!string.IsNullOrEmpty(customTable[i]) && char.TryParse(customTable[i], out char parsedChar) && char.IsLetter(parsedChar))
+                {
+                    if (!uniqueLetters.Add(customTable[i].ToUpper()))
+                        customTable[i] = "";
+                }
+                else
+                {
+                    ViewBag.DangerText = "Nieprawidłowa tabela Polibiusza. Upewnij się, że każde pole jest wypełnione.";
+                    return false;
+                }
+            }
+    
+            foreach (var letter in customTable)
+            {
+                if (String.IsNullOrEmpty(letter))
+                {
+                    ViewBag.DangerText =  "Nieprawidłowa tabela Polibiusza. Upewnij się, że każda litera jest unikalna.";
+                    return false;
+                }
+            }
+    
+            return true;
         }
     }
 
