@@ -1,12 +1,12 @@
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
-using PolibiusCipher.Controllers;
 
 namespace Ciphers.Controllers;
 
 public class CaesarController : Controller
 {
-    public static int number = 1;
+    private static int number = 1;
+    
     public ActionResult Index()
     {
         ViewBag.Number = number;
@@ -42,7 +42,7 @@ public class CaesarController : Controller
 
 public class CaesarCipher
 {
-    private static string polishAlphabet = "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż";
+    private const string polishAlphabet = "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż";
 
     public static string Encrypt(string text, int number)
     {

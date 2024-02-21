@@ -1,5 +1,3 @@
-using System;
-using System.Security;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,7 +5,7 @@ namespace PolibiusCipher.Controllers;
 
 public class PolibiusController : Controller
     {
-        public static char[,] matrix =
+        private static char[,] matrix =
         {
             { 'A', 'Ą', 'B', 'C', 'Ć', 'D', 'E' },
             { 'Ę', 'F', 'G', 'H', 'I', 'J', 'K' },
@@ -47,7 +45,7 @@ public class PolibiusController : Controller
             return View("Index");
         }
 
-        public bool UpdateMatrix(char[] v)
+        private bool UpdateMatrix(char[] v)
         {
             for (int i = 0; i < 5; i++)
             {
@@ -62,7 +60,7 @@ public class PolibiusController : Controller
             return true;
         }
         
-        public bool IsCustomTableValidAndUnique(char[,] customCharTable)
+        private bool IsCustomTableValidAndUnique(char[,] customCharTable)
         {
             string[] customTable = new string[35];
             int counter = 0;
@@ -167,7 +165,7 @@ public class PolibiusController : Controller
             return decryptedText.ToString();
         }
 
-        public static bool IsPrime(int number)
+        private static bool IsPrime(int number)
         {
             if (number <= 1)
                 return false;
