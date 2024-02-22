@@ -67,7 +67,7 @@ public class PolibiusController : Controller
     public ActionResult SetPolibiustable(string stringTable = "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż")
     {
         char[] table = new char[35];
-        stringTable = stringTable.Trim();
+        stringTable = stringTable.Trim().ToUpper();
         
         try
         {
