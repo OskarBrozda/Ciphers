@@ -11,6 +11,19 @@
     
     <br/>
     
+    <div class="form-group">
+        <label >Wczytaj ciąg liter do tablicy Polibiusza:</label>
+        <input name="stringTable" id="stringTable" class="form-control" value=" @ViewBag.Table" placeholder="kliknij ZRESETUJ, aby wczytać wartości domyślne">
+    </div>
+    
+    <br/>
+    
+    <div style="text-align: center">
+        <button type="submit" class="btn btn-primary" asp-action="SetPolibiustable">Wczytaj / zresetuj</button>
+    </div>
+    
+    <br/>
+    
     <table class="table table-bordered polibiusTable">
         @for (int i = 0; i < 5; i++)
         {

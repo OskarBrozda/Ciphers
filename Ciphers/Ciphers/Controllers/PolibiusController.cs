@@ -1,4 +1,5 @@
 using System.Text;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 
 namespace PolibiusCipher.Controllers;
@@ -17,22 +18,38 @@ public class PolibiusController : Controller
     public ActionResult Index()
     {
         ViewBag.PolibiusMatrix = matrix;
+        ViewBag.Table = tableToString(matrix);
         return View();
     }
 
     [HttpPost]
     public ActionResult EncryptDecrypt(string text, string action, char[] v)
     {
-        if (!UpdateMatrix(v))
-        {
-            ViewBag.PolibiusMatrix = matrix;
-            return View("Index");
-        }
-
         if (string.IsNullOrEmpty(text))
         {
             ViewBag.DangerText = "Wprowadź tekst!";
             ViewBag.PolibiusMatrix = matrix;
+            ViewBag.Table = tableToString(matrix);
+            return View("Index");
+        }
+        
+        try
+        {
+            matrix = PolibiusCipher.UpdateMatrix(v);
+        }
+        catch (IndexOutOfRangeException)
+        {
+            ViewBag.DangerText = "Nieprawidłowa tabela Polibiusza. Upewnij się, że każde pole jest wypełnione.";
+            ViewBag.PolibiusMatrix = matrix;
+            ViewBag.Table = tableToString(matrix);
+            return View("Index");
+        }
+        catch (Exception e)
+        {
+            matrix = PolibiusCipher.UpdateMatrix(v, "no");
+            ViewBag.DangerText = e.Message;
+            ViewBag.PolibiusMatrix = matrix;
+            ViewBag.Table = tableToString(matrix);
             return View("Index");
         }
 
@@ -42,59 +59,61 @@ public class PolibiusController : Controller
             ViewBag.result = PolibiusCipher.Decrypt(text, matrix);
 
         ViewBag.PolibiusMatrix = matrix;
+        ViewBag.Table = tableToString(matrix);
         return View("Index");
     }
 
-    private bool UpdateMatrix(char[] v)
+    [HttpPost]
+    public ActionResult SetPolibiustable(string stringTable = "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż")
     {
+        char[] table = new char[35];
+        stringTable = stringTable.Trim();
+        
+        try
+        {
+            if (stringTable.Length > 35) throw new IndexOutOfRangeException("Zbyt duża ilość znaków do wczytania!");
+            
+            for (int i = 0; i < stringTable.Length; i++)
+                table[i] = stringTable[i];
+            
+            matrix = PolibiusCipher.UpdateMatrix(table);
+        }
+        catch (IndexOutOfRangeException e)
+        {
+            if(e.Message == "Zbyt duża ilość znaków do wczytania!") 
+                ViewBag.DangerText = e.Message;
+            else
+                ViewBag.DangerText = "Nieprawidłowa tabela Polibiusza. Upewnij się, że każde pole jest wypełnione.";
+            ViewBag.PolibiusMatrix = matrix;
+            ViewBag.Table = stringTable;
+            return View("Index");
+        }
+        catch (Exception e)
+        {
+            matrix = PolibiusCipher.UpdateMatrix(table, "no");
+            ViewBag.DangerText = e.Message;
+            ViewBag.PolibiusMatrix = matrix;
+            ViewBag.Table = stringTable;
+            return View("Index");
+        }
+
+        ViewBag.PolibiusMatrix = matrix;
+        ViewBag.Table = stringTable;
+        return View("Index");
+    }
+
+    private string tableToString(char[,] c)
+    {
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 5; i++)
         {
             for (int j = 0; j < 7; j++)
             {
-                int index = i * 7 + j;
-                matrix[i, j] = v[index];
+                sb.Append(c[i,j]);
             }
         }
 
-        if (!IsCustomTableValidAndUnique(matrix)) return false;
-        return true;
-    }
-
-    private bool IsCustomTableValidAndUnique(char[,] customCharTable)
-    {
-        string[] customTable = new string[35];
-        int counter = 0;
-        foreach (char c in customCharTable)
-            customTable[counter++] = c.ToString();
-
-
-        HashSet<string> uniqueLetters = new HashSet<string>();
-
-        for (int i = 0; i < customTable.Length; i++)
-        {
-            if (!string.IsNullOrEmpty(customTable[i]) && char.TryParse(customTable[i], out char parsedChar) &&
-                char.IsLetter(parsedChar))
-            {
-                if (!uniqueLetters.Add(customTable[i].ToUpper()))
-                    customTable[i] = "";
-            }
-            else
-            {
-                ViewBag.DangerText = "Nieprawidłowa tabela Polibiusza. Upewnij się, że każde pole jest wypełnione.";
-                return false;
-            }
-        }
-
-        foreach (var letter in customTable)
-        {
-            if (String.IsNullOrEmpty(letter))
-            {
-                ViewBag.DangerText = "Nieprawidłowa tabela Polibiusza. Upewnij się, że każda litera jest unikalna.";
-                return false;
-            }
-        }
-
-        return true;
+        return sb.ToString();
     }
 }
 
@@ -163,6 +182,53 @@ public class PolibiusCipher
         }
 
         return decryptedText.ToString();
+    }
+    
+    public static char[,] UpdateMatrix(char[] v, string checkForUnique = "yes")
+    {
+        char[,] matrix = new char[5,7];
+        for (int i = 0; i < 5; i++)
+        {
+            for (int j = 0; j < 7; j++)
+            {
+                int index = i * 7 + j;
+                matrix[i, j] = v[index];
+            }
+        }
+        
+        if(checkForUnique=="yes") 
+            IsCustomTableUnique(matrix);
+        
+        return matrix;
+    }
+
+    private static void IsCustomTableUnique(char[,] customCharTable)
+    {
+        string[] customTable = new string[35];
+        int counter = 0;
+        foreach (char c in customCharTable)
+            customTable[counter++] = c.ToString();
+        
+        
+        HashSet<string> uniqueLetters = new HashSet<string>();
+        
+        for (int i = 0; i < customTable.Length; i++)
+        {
+            if (!string.IsNullOrEmpty(customTable[i]) && char.TryParse(customTable[i], out char parsedChar) &&
+                char.IsLetter(parsedChar))
+            {
+                if (!uniqueLetters.Add(customTable[i].ToUpper()))
+                    customTable[i] = "";
+            }
+            else
+                throw new Exception("Nieprawidłowa tabela Polibiusza. Upewnij się, że każde pole jest wypełnione literą.");
+        }
+
+        foreach (var letter in customTable)
+        {
+            if (String.IsNullOrEmpty(letter))
+                throw new Exception("Nieprawidłowa tabela Polibiusza. Upewnij się, że każda litera jest unikalna.");
+        }
     }
 
     private static bool IsPrime(int number)
