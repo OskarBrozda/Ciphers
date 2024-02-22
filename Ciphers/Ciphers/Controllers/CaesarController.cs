@@ -53,11 +53,7 @@ public class CaesarCipher
             if (char.IsLetter(c))
             {
                 int index = (polishAlphabet.IndexOf(char.ToLower(c)) + number) % polishAlphabet.Length;
-                
-                char encryptedChar = char.IsUpper(c)
-                    ? char.ToUpper(polishAlphabet[index])
-                    : polishAlphabet[index];
-                
+                char encryptedChar = polishAlphabet[index];
                 encryptedText.Append(encryptedChar);
             }
             else if (c == ' ')
@@ -77,11 +73,7 @@ public class CaesarCipher
             {
                 int index = (polishAlphabet.IndexOf(char.ToLower(c)) - number + polishAlphabet.Length) %
                             polishAlphabet.Length;
-                
-                char decryptedChar = char.IsUpper(c)
-                    ? char.ToUpper(polishAlphabet[index])
-                    : polishAlphabet[index];
-                
+                char decryptedChar = polishAlphabet[index];
                 decryptedText.Append(decryptedChar);
             }
             else if (c == ' ')

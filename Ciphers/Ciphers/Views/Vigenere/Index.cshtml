@@ -1,12 +1,17 @@
 @{
-    ViewBag.Title = "Trithemius Cipher";
+    ViewBag.Title = "Vigenère’a Cipher";
 }
 
-<h1 style="text-align: center">Szyfr Trithemiusa</h1>
+<h1 style="text-align: center">Szyfr Vigenère’a</h1>
 <br/>
-<form asp-action="EncryptDecrypt" asp-controller="Trithemius">
+<form asp-action="EncryptDecrypt" asp-controller="Vigenere">
     <div class="form-group">
         <textarea name="text" id="text" class="form-control" rows="3" placeholder="wprowadź tekst">@ViewBag.Result</textarea>
+    </div>
+    
+    <div class="form-group" >
+        <label for="keyWorld">Słowo klucz:</label>
+        <input type="text" class="form-control" name="keyWorld" value="@ViewBag.KeyWorld" placeholder="słowo klucz"/>
     </div>
     
     @if (ViewBag.DangerText != null)

@@ -60,3 +60,7 @@ h4+p>span{
   margin-top: 0; 
   font-size: 17px
 }
+
+label {
+  margin-top: 17px;
+}
